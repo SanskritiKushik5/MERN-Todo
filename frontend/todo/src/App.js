@@ -1,24 +1,79 @@
 import './App.css';
+import { useState, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import Table from 'react-bootstrap/Table';
+import axios from 'axios';
 
 function App() {
+    const [todo, setTodo] = useState({
+        mytodo: ''
+    });
+    const [data, setData] = useState([]);
+    useEffect(() => {
+        loadData();
+    }, [])
+    const onInputChange = e => {
+        setTodo({ ...todo, [e.target.name]: e.target.value })
+    }
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        await axios.post('http://localhost:8080/create', todo);
+        setTodo({
+            mytodo: '',
+        });
+        loadData();
+    }
+    const onEdit = async (e) => {
+        e.preventDefault();
+        await axios.put(`http://localhost:8080/update/`, );
+    }
+    const onDelete = async (e) => {
+        e.preventDefault();
+        var id = e.target.deleteId.value;
+        await axios.delete(`http://localhost:8080/delete/${id}`);
+        loadData();
+    }
+    const loadData = async () => {
+        const result = await axios.get("http://localhost:8080/todos");
+        setData(result.data);
+    }
     return (
         <div className="app">
             <Container fluid>
                 <Row>
-                    <Col md="auto" className="m-5">
-                        <h2>Add your ToDos!!!</h2><br/><br/>
-                        <form>
-                            <Form.Control size="md" type="text" placeholder="Add your ToDo!" /><br/>
+                    <Col md="auto"  style={{margin: "5rem"}}>
+                        <h2>Add your ToDos!!!</h2><br /><br />
+                        <Form onSubmit={e => onSubmit(e)}>
+                            <Form.Control onChange={e => onInputChange(e)} value={todo.mytodo} size="md" type="text" name="mytodo" placeholder="Add your ToDo!" /><br />
                             <Button variant="dark" type="submit">Submit</Button>
-                        </form>
+                        </Form>
                     </Col>
                     <Col>
-                    <p></p>
+                        <Table class="table">
+                            <tbody>
+                                {data.map((todo) => (
+                                    <tr>
+                                        <td>{todo.mytodo}</td>
+                                        <td class="text-right">
+                                        <Form onSubmit={e => onEdit(e)}>
+                                            <input hidden name="editId" value={todo._id} />
+                                            <button type="submit">Edit</button>
+                                        </Form>
+                                        </td>
+                                        <td class="text-right">
+                                        <Form onSubmit={e => onDelete(e)}>
+                                            <input hidden name="deleteId" value={todo._id} />
+                                            <button type="submit">Delete</button>
+                                        </Form>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
                     </Col>
                 </Row>
             </Container>
