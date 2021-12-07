@@ -7,12 +7,14 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Table from 'react-bootstrap/Table';
 import axios from 'axios';
+import List from './list';
 
 function App() {
     const [todo, setTodo] = useState({
         mytodo: ''
     });
     const [data, setData] = useState([]);
+    
     useEffect(() => {
         loadData();
     }, [])
@@ -27,10 +29,7 @@ function App() {
         });
         loadData();
     }
-    const onEdit = async (e) => {
-        e.preventDefault();
-        await axios.put(`http://localhost:8080/update/`, );
-    }
+    
     const onDelete = async (e) => {
         e.preventDefault();
         var id = e.target.deleteId.value;
@@ -45,10 +44,10 @@ function App() {
         <div className="app">
             <Container fluid>
                 <Row>
-                    <Col md="auto"  style={{margin: "5rem"}}>
+                    <Col md="auto" style={{ margin: "5rem" }}>
                         <h2>Add your ToDos!!!</h2><br /><br />
                         <Form onSubmit={e => onSubmit(e)}>
-                            <Form.Control onChange={e => onInputChange(e)} value={todo.mytodo} size="md" type="text" name="mytodo" placeholder="Add your ToDo!" /><br />
+                            <Form.Control onChange={e => onInputChange(e)} defaultValue={todo.mytodo} size="md" type="text" name="mytodo" placeholder="Add your ToDo!" /><br />
                             <Button variant="dark" type="submit">Submit</Button>
                         </Form>
                     </Col>
@@ -56,21 +55,7 @@ function App() {
                         <Table class="table">
                             <tbody>
                                 {data.map((todo) => (
-                                    <tr>
-                                        <td>{todo.mytodo}</td>
-                                        <td class="text-right">
-                                        <Form onSubmit={e => onEdit(e)}>
-                                            <input hidden name="editId" value={todo._id} />
-                                            <button type="submit">Edit</button>
-                                        </Form>
-                                        </td>
-                                        <td class="text-right">
-                                        <Form onSubmit={e => onDelete(e)}>
-                                            <input hidden name="deleteId" value={todo._id} />
-                                            <button type="submit">Delete</button>
-                                        </Form>
-                                        </td>
-                                    </tr>
+                                    <List todo={todo} onDelete={onDelete} loadData={loadData}/>
                                 ))}
                             </tbody>
                         </Table>
