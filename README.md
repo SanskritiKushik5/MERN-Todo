@@ -1,1 +1,1 @@
-# MERN-Todo
+# MERN-Todo - create, edit and delete
